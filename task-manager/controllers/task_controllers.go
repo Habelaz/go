@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
+	_"strconv"
 	"task-manager/data"
 	"task-manager/models"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +17,7 @@ func GetTasks(c *gin.Context) {
 }
 
 func GetSpecificTask(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
 		return
@@ -36,12 +37,13 @@ func UpdateTask(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON"})
 		return
 	}
-	id, err := strconv.Atoi(c.Param("id"))
+	
+	objectID, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
 		return
 	}
-	if _,err := data.UpdateTask(id, updatedTask); err != nil {
+	if _, err := data.UpdateTask(objectID, updatedTask); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
@@ -59,7 +61,7 @@ func CreateTask(c *gin.Context) {
 }
 
 func DeleteTask(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
 	}

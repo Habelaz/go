@@ -1,8 +1,10 @@
 package models
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type Task struct {
-	ID int `json:"id"`
-	Title string `json:"title"`
-	Description string `json:"description"`
+	ID          primitive.ObjectID `bson:"_id,omitempty"`
+	Title       string             `bson:"title" json:"title"`
+	Description string             `bson:"description" json:"description"`
 }
 
