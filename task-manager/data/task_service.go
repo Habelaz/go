@@ -9,48 +9,19 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	_"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // var tasks = make(map[int]models.Task)
 // var nextID = 1
 
-var client *mongo.Client
-var collection *mongo.Collection
 
-func InitMongodb(mongodb_uri string)  {
-	clientOptions := options.Client().ApplyURI(mongodb_uri)
-	client,err := mongo.Connect(context.TODO(),clientOptions)
-
-	if err != nil{
-		log.Fatal(err)
-	}
-	err = client.Ping(context.TODO(), nil)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-	collection = client.Database("taskManager").Collection("tasks")
-}
-
-func DisconnectMongo() error {
-	if client != nil{
-		err := client.Disconnect(context.TODO())
-		if err != nil {
-			return err
-		}
-		client = nil
-		collection = nil
-		return nil
-	}
-	return nil
-}
 
 func GetAllTasks() []models.Task{
 	var allTasks []models.Task
 
-	cur,err := collection.Find(context.TODO(),bson.D{{}})
+	cur,err := collection.Find(context.TODO(),bson.D{{"user_id",primitive.NilObjectID}})
 	if err != nil{
 		log.Fatal(err)
 	}

@@ -55,9 +55,11 @@ func CreateTask(c *gin.Context) {
 	if err := c.BindJSON(&newTask); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON"})
 		return
-	}
+	} 
+	
 	data.CreateTask(newTask)
-	c.IndentedJSON(http.StatusCreated, gin.H{"message": "Task created successfully"})
+
+	c.IndentedJSON(http.StatusCreated,newTask)
 }
 
 func DeleteTask(c *gin.Context) {
@@ -67,4 +69,34 @@ func DeleteTask(c *gin.Context) {
 	}
 	data.DeleteTask(id)
 	c.IndentedJSON(http.StatusOK,gin.H{"message":"Deleted Succesfully"})
+}
+
+func Register(c *gin.Context){
+	var user models.User
+	if err := c.ShouldBindBodyWithJSON(&user); err != nil{
+		c.JSON(http.StatusBadRequest,err)
+	}
+	if user.Role == ""{
+		user.Role = "user"
+	}
+	newUser,err := data.UserRegister(user)
+	if err != nil{
+		c.JSON(http.StatusInternalServerError,err)
+		return
+	}
+	c.JSON(http.StatusCreated,newUser)
+
+}
+
+func Login(c *gin.Context){
+	var user models.User
+	if err := c.ShouldBindBodyWithJSON(&user); err != nil{
+		c.JSON(http.StatusBadRequest,err)
+	}
+	existingUser,err,token := data.UserLogin(user)
+	if err !=nil {
+		c.JSON(http.StatusInternalServerError,err)
+		return
+	}
+	c.JSON(http.StatusOK,gin.H{"token":token,"user":existingUser})
 }
